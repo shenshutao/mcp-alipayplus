@@ -1,0 +1,223 @@
+{
+  "operation_id": "alipayplus.payment.getPaymentCode",
+  "intent": "Get payment code from Alipay+",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/payments/getPaymentCode",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/payments/getPaymentCode\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "codeType": {
+      "type": "string",
+      "required": true,
+      "description": "Type of code to generate",
+      "enum": ["BARCODE", "QRCODE"]
+    },
+    "codeDisplayType": {
+      "type": "string",
+      "required": true,
+      "description": "Display type of the code",
+      "enum": ["TEXT", "IMAGE"]
+    },
+    "customerId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by MPP to identify a user",
+      "maxLength": 64
+    },
+    "region": {
+      "type": "string",
+      "required": false,
+      "description": "Region for payment code generation",
+      "maxLength": 8
+    },
+    "extendInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Extended information for payment code",
+      "maxLength": 1000
+    },
+    "env": {
+      "type": "object",
+      "required": false,
+      "description": "Environment information",
+      "properties": {
+        "terminalType": {
+          "type": "string",
+          "description": "Terminal type: WEB, WAP, APP"
+        },
+        "osType": {
+          "type": "string",
+          "description": "Operating system type"
+        },
+        "clientIp": {
+          "type": "string",
+          "description": "Client IP address"
+        }
+      }
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Payment code generation response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the payment code generation",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, USER_NOT_EXIST, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "codeValue": {
+          "type": "string",
+          "required": false,
+          "description": "Generated payment code value",
+          "maxLength": 512
+        },
+        "codeImage": {
+          "type": "string",
+          "required": false,
+          "description": "Base64 encoded image of the payment code"
+        },
+        "codeExpireTime": {
+          "type": "string",
+          "required": false,
+          "description": "Code expiration time in ISO 8601 format"
+        },
+        "codeImageHeight": {
+          "type": "string",
+          "required": false,
+          "description": "Height of the code image in pixels"
+        },
+        "codeImageWidth": {
+          "type": "string",
+          "required": false,
+          "description": "Width of the code image in pixels"
+        },
+        "refreshTime": {
+          "type": "string",
+          "required": false,
+          "description": "Code refresh time in ISO 8601 format"
+        },
+        "customerId": {
+          "type": "string",
+          "required": false,
+          "description": "Customer ID in MPP system",
+          "maxLength": 64
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "USER_NOT_EXIST": {
+      "message": "User not found",
+      "solution": "Check customerId"
+    },
+    "USER_STATUS_ABNORMAL": {
+      "message": "User status is abnormal",
+      "solution": "Check user account status"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "PROCESS_FAIL": {
+      "message": "Payment code generation failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Generate QR code for payment",
+      "request": {
+        "codeType": "QRCODE",
+        "codeDisplayType": "IMAGE",
+        "customerId": "user_123456",
+        "region": "MY",
+        "env": {
+          "terminalType": "APP",
+          "osType": "iOS",
+          "clientIp": "192.168.1.1"
+        }
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Payment code generated successfully"
+        },
+        "codeValue": "12345678901234567890",
+        "codeImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+        "codeExpireTime": "2024-01-01T14:40:00+08:00",
+        "codeImageHeight": "200",
+        "codeImageWidth": "200",
+        "refreshTime": "2024-01-01T14:35:00+08:00",
+        "customerId": "user_123456"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "payment-code",
+    "qrcode"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/get_payment_code?role=MPP&product=Payment1&version=1.5.9"
+} 

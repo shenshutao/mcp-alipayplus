@@ -1,0 +1,166 @@
+{
+  "operation_id": "alipayplus.payment.cancelPayment",
+  "intent": "Cancel a payment order",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/payments/cancelPayment",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/payments/cancelPayment\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "paymentRequestId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify a payment order",
+      "maxLength": 64
+    },
+    "paymentId": {
+      "type": "string",
+      "required": false,
+      "description": "Unique payment ID assigned by MPP",
+      "maxLength": 64
+    },
+    "cancellationReason": {
+      "type": "string",
+      "required": false,
+      "description": "Reason for cancellation",
+      "maxLength": 256
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Payment cancellation response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the cancellation",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PAYMENT_NOT_FOUND, ORDER_IS_CLOSED, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "paymentId": {
+          "type": "string",
+          "required": false,
+          "description": "Unique payment ID assigned by MPP",
+          "maxLength": 64
+        },
+        "cancellationTime": {
+          "type": "string",
+          "required": false,
+          "description": "Payment cancellation time in ISO 8601 format"
+        },
+        "paymentStatus": {
+          "type": "string",
+          "required": false,
+          "description": "Updated payment status",
+          "enum": ["CANCELLED"]
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "PAYMENT_NOT_FOUND": {
+      "message": "Payment not found",
+      "solution": "Check paymentRequestId or paymentId"
+    },
+    "ORDER_IS_CLOSED": {
+      "message": "Order is already closed",
+      "solution": "Cannot cancel already closed order"
+    },
+    "PAYMENT_ALREADY_CANCELLED": {
+      "message": "Payment is already cancelled",
+      "solution": "Cannot cancel already cancelled payment"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "PROCESS_FAIL": {
+      "message": "Cancellation processing failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Cancel payment order",
+      "request": {
+        "paymentRequestId": "pay_20240101_123456",
+        "paymentId": "mpp_pay_123456",
+        "cancellationReason": "User requested cancellation"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Payment cancelled successfully"
+        },
+        "paymentId": "mpp_pay_123456",
+        "cancellationTime": "2024-01-01T14:35:00+08:00",
+        "paymentStatus": "CANCELLED"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "cancel",
+    "cancellation"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/cancel_payment?role=MPP&product=Payment1&version=1.5.9"
+} 

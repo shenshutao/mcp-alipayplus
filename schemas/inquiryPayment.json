@@ -1,0 +1,225 @@
+{
+  "operation_id": "alipayplus.payment.inquiryPayment",
+  "intent": "Query payment status from Alipay+",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/payments/inquiryPayment",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/payments/inquiryPayment\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "paymentRequestId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify a payment order",
+      "maxLength": 64
+    },
+    "paymentId": {
+      "type": "string",
+      "required": false,
+      "description": "Unique payment ID assigned by MPP",
+      "maxLength": 64
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Payment status inquiry response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the inquiry",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PAYMENT_NOT_FOUND, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "paymentStatus": {
+          "type": "string",
+          "required": false,
+          "description": "Current payment status",
+          "enum": ["PROCESSING", "SUCCESS", "FAILED", "CANCELLED"]
+        },
+        "paymentId": {
+          "type": "string",
+          "required": false,
+          "description": "Unique payment ID assigned by MPP",
+          "maxLength": 64
+        },
+        "paymentAmount": {
+          "type": "object",
+          "required": false,
+          "description": "Payment amount",
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "Currency code"
+            },
+            "value": {
+              "type": "string",
+              "description": "Amount value"
+            }
+          }
+        },
+        "payToAmount": {
+          "type": "object",
+          "required": false,
+          "description": "Settlement amount",
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "Currency code"
+            },
+            "value": {
+              "type": "string",
+              "description": "Amount value"
+            }
+          }
+        },
+        "paymentTime": {
+          "type": "string",
+          "required": false,
+          "description": "Payment completion time in ISO 8601 format"
+        },
+        "paymentCreateTime": {
+          "type": "string",
+          "required": false,
+          "description": "Payment creation time in ISO 8601 format"
+        },
+        "actualPaymentAmount": {
+          "type": "object",
+          "required": false,
+          "description": "Actual payment amount",
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "Currency code"
+            },
+            "value": {
+              "type": "string",
+              "description": "Amount value"
+            }
+          }
+        },
+        "paymentResultInfo": {
+          "type": "object",
+          "required": false,
+          "description": "Detailed payment result information",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Payment result code"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Payment result message"
+            }
+          }
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "PAYMENT_NOT_FOUND": {
+      "message": "Payment not found",
+      "solution": "Check paymentRequestId or paymentId"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PROCESS_FAIL": {
+      "message": "Inquiry processing failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Payment status inquiry",
+      "request": {
+        "paymentRequestId": "pay_20240101_123456",
+        "paymentId": "mpp_pay_123456"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Inquiry successful"
+        },
+        "paymentStatus": "SUCCESS",
+        "paymentId": "mpp_pay_123456",
+        "paymentAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "payToAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "paymentTime": "2024-01-01T14:30:00+08:00",
+        "paymentCreateTime": "2024-01-01T14:25:00+08:00"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "inquiry",
+    "status"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/inquiry_payment?role=MPP&product=Payment1&version=1.5.9"
+} 

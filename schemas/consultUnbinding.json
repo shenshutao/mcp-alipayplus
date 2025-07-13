@@ -1,0 +1,204 @@
+{
+  "operation_id": "alipayplus.auth.consultUnbinding",
+  "intent": "Consult unbinding operation from Alipay+",
+  "direction": "Alipay+ → MPP",
+  "method": "POST",
+  "endpoint": "/auth/consult-unbinding",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /auth/consult-unbinding\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "customerId": {
+      "type": "string",
+      "required": true,
+      "description": "Customer ID in Alipay+ system",
+      "maxLength": 64
+    },
+    "accessToken": {
+      "type": "string",
+      "required": false,
+      "description": "Access token associated with the customer",
+      "maxLength": 128
+    },
+    "unbindingReason": {
+      "type": "string",
+      "required": false,
+      "description": "Reason for unbinding",
+      "maxLength": 256
+    },
+    "consultTime": {
+      "type": "string",
+      "required": true,
+      "description": "Consultation time in ISO 8601 format"
+    },
+    "extendInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Extended information for unbinding consultation",
+      "maxLength": 1000
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by Alipay+ to MPP",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Unbinding consultation response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the unbinding consultation",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PROCESS_FAIL, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "unbindingAllowed": {
+          "type": "string",
+          "required": false,
+          "description": "Whether unbinding is allowed",
+          "enum": ["true", "false"]
+        },
+        "unbindingRestrictions": {
+          "type": "array",
+          "required": false,
+          "description": "List of unbinding restrictions",
+          "items": {
+            "type": "object",
+            "properties": {
+              "restrictionType": {
+                "type": "string",
+                "description": "Type of restriction"
+              },
+              "restrictionMessage": {
+                "type": "string",
+                "description": "Restriction message"
+              }
+            }
+          }
+        },
+        "recommendedActions": {
+          "type": "array",
+          "required": false,
+          "description": "Recommended actions before unbinding",
+          "items": {
+            "type": "string"
+          }
+        },
+        "consultationTime": {
+          "type": "string",
+          "required": false,
+          "description": "Consultation processing time in ISO 8601 format"
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "CUSTOMER_NOT_FOUND": {
+      "message": "Customer not found",
+      "solution": "Check customer ID"
+    },
+    "INVALID_TOKEN": {
+      "message": "Invalid access token",
+      "solution": "Check token validity"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature with Alipay+ public key"
+    },
+    "PROCESS_FAIL": {
+      "message": "Unbinding consultation failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Consult unbinding operation",
+      "request": {
+        "customerId": "customer_123456",
+        "accessToken": "access_token_123456",
+        "unbindingReason": "User requested account deletion",
+        "consultTime": "2024-01-01T14:30:00+08:00"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Unbinding consultation completed"
+        },
+        "unbindingAllowed": "true",
+        "unbindingRestrictions": [
+          {
+            "restrictionType": "PENDING_PAYMENTS",
+            "restrictionMessage": "Complete all pending payments before unbinding"
+          }
+        ],
+        "recommendedActions": [
+          "Cancel all pending payments",
+          "Withdraw remaining balance"
+        ],
+        "consultationTime": "2024-01-01T14:30:00+08:00"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "auth",
+    "mpp",
+    "alipay-plus",
+    "unbinding",
+    "consultation",
+    "webhook"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/consult_unbinding?role=MPP&product=Payment1&version=1.5.9"
+} 

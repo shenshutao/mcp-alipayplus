@@ -1,0 +1,140 @@
+{
+  "operation_id": "alipayplus.auth.cancelToken",
+  "intent": "Cancel authorization token",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/authorizations/cancelToken",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/authorizations/cancelToken\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "accessToken": {
+      "type": "string",
+      "required": true,
+      "description": "Access token to be cancelled",
+      "maxLength": 128
+    },
+    "extendInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Extended information",
+      "maxLength": 1000
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Token cancellation response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the token cancellation",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, INVALID_TOKEN, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "cancellationTime": {
+          "type": "string",
+          "required": false,
+          "description": "Token cancellation time in ISO 8601 format"
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "INVALID_TOKEN": {
+      "message": "Invalid access token",
+      "solution": "Check token validity"
+    },
+    "TOKEN_ALREADY_CANCELLED": {
+      "message": "Token is already cancelled",
+      "solution": "Cannot cancel already cancelled token"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "PROCESS_FAIL": {
+      "message": "Token cancellation failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Cancel access token",
+      "request": {
+        "accessToken": "access_token_123456"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Token cancelled successfully"
+        },
+        "cancellationTime": "2024-01-01T15:30:00+08:00"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "auth",
+    "mpp",
+    "alipay-plus",
+    "token",
+    "cancellation"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/cancel_token?role=MPP&product=Payment1&version=1.5.9"
+} 

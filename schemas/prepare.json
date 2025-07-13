@@ -1,0 +1,316 @@
+{
+  "operation_id": "alipayplus.payment.prepare",
+  "intent": "Prepare payment order with Alipay+",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/payments/prepare",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/payments/prepare\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "order": {
+      "type": "object",
+      "required": true,
+      "description": "Order information",
+      "properties": {
+        "referenceOrderId": {
+          "type": "string",
+          "required": true,
+          "description": "Merchant order ID",
+          "maxLength": 64
+        },
+        "orderDescription": {
+          "type": "string",
+          "required": true,
+          "description": "Order description",
+          "maxLength": 256
+        },
+        "orderAmount": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "Currency code"
+            },
+            "value": {
+              "type": "string",
+              "description": "Amount value"
+            }
+          }
+        },
+        "merchant": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "referenceMerchantId": {
+              "type": "string",
+              "description": "Merchant ID",
+              "maxLength": 64
+            },
+            "merchantName": {
+              "type": "string",
+              "description": "Merchant name",
+              "maxLength": 256
+            },
+            "merchantMcc": {
+              "type": "string",
+              "description": "Merchant category code",
+              "maxLength": 8
+            },
+            "store": {
+              "type": "object",
+              "properties": {
+                "referenceStoreId": {
+                  "type": "string",
+                  "description": "Store ID",
+                  "maxLength": 64
+                },
+                "storeName": {
+                  "type": "string",
+                  "description": "Store name",
+                  "maxLength": 256
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "productCode": {
+      "type": "string",
+      "required": true,
+      "description": "Product code for payment",
+      "maxLength": 64
+    },
+    "paymentNotifyUrl": {
+      "type": "string",
+      "required": false,
+      "description": "URL for payment result notifications",
+      "maxLength": 2048
+    },
+    "paymentRedirectUrl": {
+      "type": "string",
+      "required": false,
+      "description": "URL for user redirect after payment",
+      "maxLength": 2048
+    },
+    "paymentExpiryTime": {
+      "type": "string",
+      "required": false,
+      "description": "Payment expiry time in ISO 8601 format"
+    },
+    "paymentFactor": {
+      "type": "object",
+      "required": false,
+      "description": "Payment factors",
+      "properties": {
+        "isInStorePayment": {
+          "type": "string",
+          "description": "TRUE for in-store payment scenarios"
+        },
+        "isCashierPayment": {
+          "type": "string",
+          "description": "TRUE for cashier payment scenarios"
+        }
+      }
+    },
+    "env": {
+      "type": "object",
+      "required": false,
+      "description": "Environment information",
+      "properties": {
+        "terminalType": {
+          "type": "string",
+          "description": "Terminal type: WEB, WAP, APP"
+        },
+        "osType": {
+          "type": "string",
+          "description": "Operating system type"
+        },
+        "clientIp": {
+          "type": "string",
+          "description": "Client IP address"
+        }
+      }
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Payment preparation response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the payment preparation",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, MERCHANT_NOT_REGISTERED, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "paymentRequestId": {
+          "type": "string",
+          "required": false,
+          "description": "Unique payment request ID assigned by Alipay+",
+          "maxLength": 64
+        },
+        "orderCodeForm": {
+          "type": "object",
+          "required": false,
+          "description": "Order code form for payment",
+          "properties": {
+            "codeValue": {
+              "type": "string",
+              "description": "Order code value"
+            },
+            "codeImage": {
+              "type": "string",
+              "description": "Base64 encoded image of the order code"
+            },
+            "codeExpireTime": {
+              "type": "string",
+              "description": "Code expiration time in ISO 8601 format"
+            }
+          }
+        },
+        "normalUrl": {
+          "type": "string",
+          "required": false,
+          "description": "Normal URL for payment",
+          "maxLength": 2048
+        },
+        "schemeUrl": {
+          "type": "string",
+          "required": false,
+          "description": "Scheme URL for payment",
+          "maxLength": 2048
+        },
+        "deepLinkUrl": {
+          "type": "string",
+          "required": false,
+          "description": "Deep link URL for payment",
+          "maxLength": 2048
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "MERCHANT_NOT_REGISTERED": {
+      "message": "Merchant not registered",
+      "solution": "Check merchant registration status"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "PROCESS_FAIL": {
+      "message": "Payment preparation failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Prepare payment order",
+      "request": {
+        "order": {
+          "referenceOrderId": "order_123456",
+          "orderDescription": "Coffee purchase",
+          "orderAmount": {
+            "currency": "MYR",
+            "value": "15.00"
+          },
+          "merchant": {
+            "referenceMerchantId": "merchant_001",
+            "merchantName": "Coffee Shop",
+            "merchantMcc": "5814",
+            "store": {
+              "referenceStoreId": "store_001",
+              "storeName": "Downtown Coffee"
+            }
+          }
+        },
+        "productCode": "CASHIER_PAYMENT",
+        "paymentNotifyUrl": "https://mpp.example.com/notify",
+        "paymentExpiryTime": "2024-01-01T15:30:00+08:00",
+        "paymentFactor": {
+          "isInStorePayment": "true",
+          "isCashierPayment": "true"
+        }
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Payment prepared successfully"
+        },
+        "paymentRequestId": "pay_20240101_123456",
+        "orderCodeForm": {
+          "codeValue": "12345678901234567890",
+          "codeImage": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+          "codeExpireTime": "2024-01-01T15:30:00+08:00"
+        }
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "prepare",
+    "order"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/prepare?role=MPP&product=Payment1&version=1.5.9"
+} 

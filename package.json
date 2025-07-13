@@ -1,0 +1,22 @@
+{
+  "name": "payment-api-example",
+  "version": "1.0.0",
+  "description": "Axios POST example for payment API based on schemas/pay.json",
+  "main": "payment_example.js",
+  "scripts": {
+    "start": "node payment_example.js",
+    "simple": "node payment_simple.js",
+    "signature": "node payment_with_signature.js",
+    "test": "node signature_test.js",
+    "schema:list": "node -e \"console.log(JSON.stringify(require('./schemas/index.json'), null, 2))\"",
+    "schema:validate": "node -e \"const fs = require('fs'); const index = require('./schemas/index.json'); index.apis.forEach(api => { try { JSON.parse(fs.readFileSync('./schemas/' + api.file, 'utf8')); console.log('✅ ' + api.name + ' - Valid'); } catch (e) { console.log('❌ ' + api.name + ' - Invalid: ' + e.message); } });\"",
+    "schema:stats": "node -e \"const index = require('./schemas/index.json'); console.log('Total APIs:', index.total_apis); console.log('Payment APIs:', index.categories.payment.count); console.log('Auth APIs:', index.categories.auth.count); console.log('Webhooks:', index.webhooks.count); console.log('Client APIs:', index.client_apis.count);\""
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {},
+  "keywords": ["axios", "payment", "alipay", "api"],
+  "author": "",
+  "license": "ISC"
+} 

@@ -1,0 +1,421 @@
+{
+  "operation_id": "alipayplus.payment.pay",
+  "intent": "Handle payment request from Alipay+ to MPP",
+  "direction": "Alipay+ → MPP",
+  "method": "POST",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /pay\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "acquirerId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify an ACQP",
+      "maxLength": 64
+    },
+    "pspId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify an MPP",
+      "maxLength": 64
+    },
+    "order": {
+      "type": "object",
+      "required": true,
+      "description": "Order details agreed upon by buyer and merchant",
+      "properties": {
+        "referenceOrderId": {
+          "type": "string",
+          "description": "Merchant order ID"
+        },
+        "orderDescription": {
+          "type": "string",
+          "description": "Order description"
+        },
+        "orderAmount": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "Currency code"
+            },
+            "value": {
+              "type": "string",
+              "description": "Amount value"
+            }
+          }
+        },
+        "merchant": {
+          "type": "object",
+          "properties": {
+            "referenceMerchantId": {
+              "type": "string",
+              "description": "Merchant ID"
+            },
+            "merchantName": {
+              "type": "string",
+              "description": "Merchant name"
+            }
+          }
+        }
+      }
+    },
+    "paymentRequestId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify a payment order",
+      "maxLength": 64,
+      "idempotency": true
+    },
+    "paymentAmount": {
+      "type": "object",
+      "required": true,
+      "description": "Amount that Alipay+ requests to receive from MPP",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "Currency code"
+        },
+        "value": {
+          "type": "string",
+          "description": "Amount value"
+        }
+      }
+    },
+    "payToAmount": {
+      "type": "object",
+      "required": true,
+      "description": "Amount that MPP settles to Alipay+",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "Currency code"
+        },
+        "value": {
+          "type": "string",
+          "description": "Amount value"
+        }
+      }
+    },
+    "paymentQuote": {
+      "type": "object",
+      "required": false,
+      "description": "Exchange rate between paymentAmount.currency and payToAmount.currency",
+      "properties": {
+        "quoteCurrency": {
+          "type": "string",
+          "description": "Quote currency"
+        },
+        "baseCurrency": {
+          "type": "string",
+          "description": "Base currency"
+        },
+        "quoteRate": {
+          "type": "string",
+          "description": "Exchange rate"
+        }
+      }
+    },
+    "surchargeInfo": {
+      "type": "object",
+      "required": false,
+      "description": "Surcharge information collected by Alipay+ on behalf of MPP",
+      "properties": {
+        "surchargeAmount": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "paymentMethod": {
+      "type": "object",
+      "required": true,
+      "description": "Payment method used to collect payment",
+      "properties": {
+        "paymentMethodType": {
+          "type": "string",
+          "description": "Payment method type"
+        },
+        "paymentMethodId": {
+          "type": "string",
+          "description": "Payment code (User-presented mode) or access token (Auto Debit)"
+        },
+        "paymentMethodMetaData": {
+          "type": "object",
+          "properties": {
+            "paymentCodeRegion": {
+              "type": "string",
+              "description": "Payment code region"
+            }
+          }
+        }
+      }
+    },
+    "paymentFactor": {
+      "type": "object",
+      "required": true,
+      "description": "Factors that impact payment-related items",
+      "properties": {
+        "isInStorePayment": {
+          "type": "string",
+          "description": "TRUE for User-presented Mode Payment"
+        },
+        "isAgreementPayment": {
+          "type": "string",
+          "description": "TRUE for Auto Debit scenarios"
+        },
+        "isPaymentEvaluation": {
+          "type": "string",
+          "description": "TRUE for Auto Debit Payment Evaluation"
+        }
+      }
+    },
+    "paymentExpiryTime": {
+      "type": "string",
+      "required": false,
+      "description": "Time after which payment order expires (ISO 8601 format)"
+    },
+    "paymentNotifyUrl": {
+      "type": "string",
+      "required": false,
+      "description": "URL for receiving payment result notifications",
+      "maxLength": 2048
+    },
+    "paymentRedirectUrl": {
+      "type": "string",
+      "required": false,
+      "description": "URL where user is redirected after payment completion",
+      "maxLength": 2048
+    },
+    "paymentPromoInfo": {
+      "type": "object",
+      "required": false,
+      "description": "Promotion information applied to payment order",
+      "properties": {
+        "promotionId": {
+          "type": "string",
+          "description": "Promotion ID"
+        },
+        "promotionType": {
+          "type": "string",
+          "description": "Promotion type"
+        },
+        "savingsAmount": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by Alipay+ to MPP",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Success response from MPP to Alipay+",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the payment request",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PROCESS_FAIL, PARAM_ILLEGAL, ACCESS_DENIED, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message describing the result"
+            }
+          }
+        },
+        "paymentId": {
+          "type": "string",
+          "required": false,
+          "description": "Unique payment ID assigned by MPP",
+          "maxLength": 64
+        },
+        "paymentUrl": {
+          "type": "string",
+          "required": false,
+          "description": "URL for user to complete payment",
+          "maxLength": 2048
+        },
+        "paymentTime": {
+          "type": "string",
+          "required": false,
+          "description": "Time when payment was initiated (ISO 8601 format)"
+        },
+        "customerId": {
+          "type": "string",
+          "required": false,
+          "description": "Customer ID in MPP system",
+          "maxLength": 64
+        },
+        "paymentMethodMetaData": {
+          "type": "object",
+          "required": false,
+          "description": "Payment method metadata",
+          "properties": {
+            "paymentCodeRegion": {
+              "type": "string",
+              "description": "Payment code region"
+            }
+          }
+        },
+        "promotionInfo": {
+          "type": "object",
+          "required": false,
+          "description": "Promotion information",
+          "properties": {
+            "promotionId": {
+              "type": "string",
+              "description": "Promotion ID"
+            },
+            "promotionType": {
+              "type": "string",
+              "description": "Promotion type"
+            },
+            "savingsAmount": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "errors": {
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "ACCESS_DENIED": {
+      "message": "Access denied",
+      "solution": "Check authorization and permissions"
+    },
+    "PROCESS_FAIL": {
+      "message": "Payment processing failed",
+      "solution": "Check payment method and retry"
+    },
+    "UNKNOWN_EXCEPTION": {
+      "message": "Unknown exception occurred",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "User-presented mode payment example",
+      "request": {
+        "acquirerId": "20200615000000000001",
+        "pspId": "20200615000000000002",
+        "paymentRequestId": "pay_20240101_123456",
+        "paymentAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "payToAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "order": {
+          "referenceOrderId": "order_123456",
+          "orderDescription": "Sample product purchase",
+          "orderAmount": {
+            "currency": "MYR",
+            "value": "100.00"
+          },
+          "merchant": {
+            "referenceMerchantId": "merchant_001",
+            "merchantName": "Test Merchant"
+          }
+        },
+        "paymentMethod": {
+          "paymentMethodType": "ALIPAY_PLUS",
+          "paymentMethodId": "123456789012345678"
+        },
+        "paymentFactor": {
+          "isInStorePayment": "true"
+        },
+        "paymentExpiryTime": "2024-01-01T15:30:00+08:00",
+        "paymentNotifyUrl": "https://mpp.example.com/notify",
+        "paymentRedirectUrl": "https://mpp.example.com/redirect"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Payment initiated successfully"
+        },
+        "paymentId": "mpp_pay_123456",
+        "paymentTime": "2024-01-01T14:30:00+08:00"
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "webhook"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/pay?role=MPP&product=Payment1&version=1.5.9"
+}

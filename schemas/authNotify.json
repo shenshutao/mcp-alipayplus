@@ -1,0 +1,169 @@
+{
+  "operation_id": "alipayplus.auth.authNotify",
+  "intent": "Receive authorization status notification from Alipay+",
+  "direction": "Alipay+ → MPP",
+  "method": "POST",
+  "endpoint": "/auth/notify",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /auth/notify\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "customerId": {
+      "type": "string",
+      "required": true,
+      "description": "Customer ID in Alipay+ system",
+      "maxLength": 64
+    },
+    "authState": {
+      "type": "string",
+      "required": true,
+      "description": "Authorization state",
+      "enum": ["AUTHORIZED", "CANCELLED", "EXPIRED"]
+    },
+    "accessToken": {
+      "type": "string",
+      "required": false,
+      "description": "Access token (if authorized)",
+      "maxLength": 128
+    },
+    "refreshToken": {
+      "type": "string",
+      "required": false,
+      "description": "Refresh token (if authorized)",
+      "maxLength": 128
+    },
+    "accessTokenExpiryTime": {
+      "type": "string",
+      "required": false,
+      "description": "Access token expiry time in ISO 8601 format"
+    },
+    "refreshTokenExpiryTime": {
+      "type": "string",
+      "required": false,
+      "description": "Refresh token expiry time in ISO 8601 format"
+    },
+    "scopes": {
+      "type": "array",
+      "required": false,
+      "description": "Authorized scopes",
+      "items": {
+        "type": "string"
+      }
+    },
+    "authTime": {
+      "type": "string",
+      "required": true,
+      "description": "Authorization time in ISO 8601 format"
+    },
+    "notifyType": {
+      "type": "string",
+      "required": true,
+      "description": "Notification type",
+      "enum": ["AUTH_STATE_CHANGE", "TOKEN_REFRESH", "TOKEN_REVOKE"]
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by Alipay+ to MPP",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Authorization notification acknowledgment",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of notification processing",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PROCESS_FAIL, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        }
+      }
+    }
+  },
+  "errors": {
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature with Alipay+ public key"
+    },
+    "PROCESS_FAIL": {
+      "message": "Authorization notification processing failed",
+      "solution": "Check internal processing logic"
+    }
+  },
+  "examples": [
+    {
+      "description": "Authorization success notification",
+      "request": {
+        "customerId": "customer_123456",
+        "authState": "AUTHORIZED",
+        "accessToken": "access_token_123456",
+        "refreshToken": "refresh_token_123456",
+        "accessTokenExpiryTime": "2024-01-01T16:30:00+08:00",
+        "refreshTokenExpiryTime": "2024-01-31T14:30:00+08:00",
+        "scopes": ["PAYMENT"],
+        "authTime": "2024-01-01T14:30:00+08:00",
+        "notifyType": "AUTH_STATE_CHANGE"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Authorization notification processed successfully"
+        }
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "auth",
+    "mpp",
+    "alipay-plus",
+    "notification",
+    "webhook"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/auth_notify?role=MPP&product=Payment1&version=1.5.9"
+} 

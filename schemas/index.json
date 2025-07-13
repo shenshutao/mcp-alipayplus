@@ -1,0 +1,178 @@
+{
+  "name": "Alipay+ API Schema Collection",
+  "version": "1.5.9",
+  "description": "Complete MCP-compatible schema collection for Alipay+ APIs",
+  "last_updated": "2024-12-25",
+  "mcp_compatible": true,
+  "total_apis": 12,
+  "apis": [
+    {
+      "name": "pay",
+      "operation_id": "alipayplus.payment.pay",
+      "description": "Handle payment request from Alipay+",
+      "direction": "Alipay+ → MPP",
+      "method": "POST",
+      "category": "payment",
+      "file": "pay.json",
+      "required": true,
+      "webhook": true
+    },
+    {
+      "name": "userInitiatedPay",
+      "operation_id": "alipayplus.payment.userInitiatedPay",
+      "description": "Send decoding request to Alipay+ when user scans order code",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "payment",
+      "file": "userInitiatedPay.json",
+      "required": true,
+      "webhook": false
+    },
+    {
+      "name": "notifyPayment",
+      "operation_id": "alipayplus.payment.notifyPayment",
+      "description": "Receive payment result notification from Alipay+",
+      "direction": "Alipay+ → MPP",
+      "method": "POST",
+      "category": "payment",
+      "file": "notifyPayment.json",
+      "required": true,
+      "webhook": true
+    },
+    {
+      "name": "inquiryPayment",
+      "operation_id": "alipayplus.payment.inquiryPayment",
+      "description": "Query payment status from Alipay+",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "payment",
+      "file": "inquiryPayment.json",
+      "required": true,
+      "webhook": false
+    },
+    {
+      "name": "cancelPayment",
+      "operation_id": "alipayplus.payment.cancelPayment",
+      "description": "Cancel a payment order",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "payment",
+      "file": "cancelPayment.json",
+      "required": true,
+      "webhook": false
+    },
+    {
+      "name": "refund",
+      "operation_id": "alipayplus.payment.refund",
+      "description": "Handle refund request from Alipay+",
+      "direction": "Alipay+ → MPP",
+      "method": "POST",
+      "category": "payment",
+      "file": "refund.json",
+      "required": true,
+      "webhook": true
+    },
+    {
+      "name": "getPaymentCode",
+      "operation_id": "alipayplus.payment.getPaymentCode",
+      "description": "Get payment code from Alipay+",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "payment",
+      "file": "getPaymentCode.json",
+      "required": false,
+      "webhook": false
+    },
+    {
+      "name": "prepare",
+      "operation_id": "alipayplus.payment.prepare",
+      "description": "Prepare payment order with Alipay+",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "payment",
+      "file": "prepare.json",
+      "required": false,
+      "webhook": false
+    },
+    {
+      "name": "applyToken",
+      "operation_id": "alipayplus.auth.applyToken",
+      "description": "Apply for authorization token",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "auth",
+      "file": "applyToken.json",
+      "required": false,
+      "webhook": false
+    },
+    {
+      "name": "cancelToken",
+      "operation_id": "alipayplus.auth.cancelToken",
+      "description": "Cancel authorization token",
+      "direction": "MPP → Alipay+",
+      "method": "POST",
+      "category": "auth",
+      "file": "cancelToken.json",
+      "required": false,
+      "webhook": false
+    },
+    {
+      "name": "authNotify",
+      "operation_id": "alipayplus.auth.authNotify",
+      "description": "Receive authorization status notification from Alipay+",
+      "direction": "Alipay+ → MPP",
+      "method": "POST",
+      "category": "auth",
+      "file": "authNotify.json",
+      "required": false,
+      "webhook": true
+    },
+    {
+      "name": "consultUnbinding",
+      "operation_id": "alipayplus.auth.consultUnbinding",
+      "description": "Consult unbinding operation from Alipay+",
+      "direction": "Alipay+ → MPP",
+      "method": "POST",
+      "category": "auth",
+      "file": "consultUnbinding.json",
+      "required": false,
+      "webhook": true
+    }
+  ],
+  "categories": {
+    "payment": {
+      "description": "Payment-related APIs",
+      "count": 8,
+      "apis": ["pay", "userInitiatedPay", "notifyPayment", "inquiryPayment", "cancelPayment", "refund", "getPaymentCode", "prepare"]
+    },
+    "auth": {
+      "description": "Authorization-related APIs",
+      "count": 4,
+      "apis": ["applyToken", "cancelToken", "authNotify", "consultUnbinding"]
+    }
+  },
+  "webhooks": {
+    "description": "APIs that receive notifications from Alipay+",
+    "count": 5,
+    "apis": ["pay", "notifyPayment", "refund", "authNotify", "consultUnbinding"]
+  },
+  "client_apis": {
+    "description": "APIs called by MPP to Alipay+",
+    "count": 7,
+    "apis": ["userInitiatedPay", "inquiryPayment", "cancelPayment", "getPaymentCode", "prepare", "applyToken", "cancelToken"]
+  },
+  "signature_verification": {
+    "required": true,
+    "algorithm": "RSA256",
+    "description": "All APIs require RSA256 signature verification"
+  },
+  "documentation_base": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/",
+  "tags": [
+    "alipay-plus",
+    "mpp",
+    "payment",
+    "auth",
+    "webhook",
+    "mcp"
+  ]
+} 

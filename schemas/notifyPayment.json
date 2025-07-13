@@ -1,0 +1,231 @@
+{
+  "operation_id": "alipayplus.payment.notifyPayment",
+  "intent": "Receive payment result notification from Alipay+",
+  "direction": "Alipay+ → MPP",
+  "method": "POST",
+  "endpoint": "/notify/payment",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /notify/payment\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "acquirerId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify an ACQP",
+      "maxLength": 64
+    },
+    "pspId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify an MPP",
+      "maxLength": 64
+    },
+    "paymentRequestId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID assigned by Alipay+ to identify a payment order",
+      "maxLength": 64
+    },
+    "paymentId": {
+      "type": "string",
+      "required": false,
+      "description": "Unique payment ID assigned by MPP",
+      "maxLength": 64
+    },
+    "paymentAmount": {
+      "type": "object",
+      "required": true,
+      "description": "Payment amount",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "Currency code"
+        },
+        "value": {
+          "type": "string",
+          "description": "Amount value"
+        }
+      }
+    },
+    "payToAmount": {
+      "type": "object",
+      "required": true,
+      "description": "Settlement amount",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "Currency code"
+        },
+        "value": {
+          "type": "string",
+          "description": "Amount value"
+        }
+      }
+    },
+    "paymentTime": {
+      "type": "string",
+      "required": true,
+      "description": "Payment completion time in ISO 8601 format"
+    },
+    "paymentStatus": {
+      "type": "string",
+      "required": true,
+      "description": "Payment status: SUCCESS, FAILED, CANCELLED",
+      "enum": ["SUCCESS", "FAILED", "CANCELLED"]
+    },
+    "order": {
+      "type": "object",
+      "required": false,
+      "description": "Order information",
+      "properties": {
+        "referenceOrderId": {
+          "type": "string",
+          "description": "Merchant order ID"
+        },
+        "orderDescription": {
+          "type": "string",
+          "description": "Order description"
+        }
+      }
+    },
+    "actualPaymentAmount": {
+      "type": "object",
+      "required": false,
+      "description": "Actual payment amount (if different from paymentAmount)",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "Currency code"
+        },
+        "value": {
+          "type": "string",
+          "description": "Amount value"
+        }
+      }
+    },
+    "paymentResultInfo": {
+      "type": "object",
+      "required": false,
+      "description": "Detailed payment result information",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "Payment result code"
+        },
+        "resultMessage": {
+          "type": "string",
+          "description": "Payment result message"
+        }
+      }
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by Alipay+ to MPP",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Acknowledgment response from MPP",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of notification processing",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, PROCESS_FAIL, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        }
+      }
+    }
+  },
+  "errors": {
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature with Alipay+ public key"
+    },
+    "PROCESS_FAIL": {
+      "message": "Notification processing failed",
+      "solution": "Check internal processing logic"
+    }
+  },
+  "examples": [
+    {
+      "description": "Payment success notification",
+      "request": {
+        "acquirerId": "20200615000000000001",
+        "pspId": "20200615000000000002",
+        "paymentRequestId": "pay_20240101_123456",
+        "paymentId": "mpp_pay_123456",
+        "paymentAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "payToAmount": {
+          "currency": "MYR",
+          "value": "100.00"
+        },
+        "paymentTime": "2024-01-01T14:30:00+08:00",
+        "paymentStatus": "SUCCESS"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Notification processed successfully"
+        }
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "payment",
+    "mpp",
+    "alipay-plus",
+    "notification",
+    "webhook"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/notify_payment?role=MPP&product=Payment1&version=1.5.9"
+} 

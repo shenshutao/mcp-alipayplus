@@ -1,0 +1,190 @@
+{
+  "operation_id": "alipayplus.auth.applyToken",
+  "intent": "Apply for authorization token",
+  "direction": "MPP → Alipay+",
+  "method": "POST",
+  "endpoint": "/aps/api/v1/authorizations/applyToken",
+  "auth": {
+    "type": "Signature",
+    "in": "header",
+    "required_headers": {
+      "Client-Id": {
+        "type": "string",
+        "required": true,
+        "description": "MPP client identifier assigned by Alipay+",
+        "maxLength": 64
+      },
+      "Request-Time": {
+        "type": "string",
+        "required": true,
+        "description": "Request timestamp in ISO 8601 format"
+      },
+      "Signature": {
+        "type": "string",
+        "required": true,
+        "description": "Signature in format: algorithm=RSA256,keyVersion=0,signature=<generated_signature>"
+      }
+    },
+    "signature_algorithm": "RSA256",
+    "content_to_be_signed": {
+      "format": "<HTTP-METHOD> <Request-URI>\\n<Client-Id>.<Request-Time>.<Request-Body>",
+      "example": "POST /aps/api/v1/authorizations/applyToken\\n<Client-Id>.<Request-Time>.<Request-Body>"
+    }
+  },
+  "params": {
+    "authCode": {
+      "type": "string",
+      "required": true,
+      "description": "Authorization code from user consent",
+      "maxLength": 128
+    },
+    "grantType": {
+      "type": "string",
+      "required": true,
+      "description": "Authorization grant type",
+      "enum": ["AUTHORIZATION_CODE"]
+    },
+    "customerBelongsTo": {
+      "type": "string",
+      "required": false,
+      "description": "Customer belongs to which system",
+      "maxLength": 32
+    },
+    "extendInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Extended information",
+      "maxLength": 1000
+    },
+    "passThroughInfo": {
+      "type": "string",
+      "required": false,
+      "description": "Information passed through by MPP to Alipay+",
+      "maxLength": 20000
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Token application response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "required": true,
+          "description": "Result of the token application",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "Result code: SUCCESS, INVALID_AUTH_CODE, etc."
+            },
+            "resultStatus": {
+              "type": "string",
+              "description": "Result status: S (Success), F (Failure), U (Unknown)"
+            },
+            "resultMessage": {
+              "type": "string",
+              "description": "Result message"
+            }
+          }
+        },
+        "accessToken": {
+          "type": "string",
+          "required": false,
+          "description": "Access token for future API calls",
+          "maxLength": 128
+        },
+        "refreshToken": {
+          "type": "string",
+          "required": false,
+          "description": "Refresh token for renewing access token",
+          "maxLength": 128
+        },
+        "accessTokenExpiryTime": {
+          "type": "string",
+          "required": false,
+          "description": "Access token expiry time in ISO 8601 format"
+        },
+        "refreshTokenExpiryTime": {
+          "type": "string",
+          "required": false,
+          "description": "Refresh token expiry time in ISO 8601 format"
+        },
+        "customerId": {
+          "type": "string",
+          "required": false,
+          "description": "Customer ID in Alipay+ system",
+          "maxLength": 64
+        },
+        "scopes": {
+          "type": "array",
+          "required": false,
+          "description": "Authorized scopes",
+          "items": {
+            "type": "string"
+          }
+        },
+        "passThroughInfo": {
+          "type": "string",
+          "required": false,
+          "description": "Information passed through by Alipay+ to MPP",
+          "maxLength": 20000
+        }
+      }
+    }
+  },
+  "errors": {
+    "INVALID_AUTH_CODE": {
+      "message": "Invalid authorization code",
+      "solution": "Check authorization code validity"
+    },
+    "EXPIRED_AUTH_CODE": {
+      "message": "Authorization code has expired",
+      "solution": "Request new authorization code"
+    },
+    "INVALID_SIGNATURE": {
+      "message": "Invalid signature",
+      "solution": "Verify signature generation and private key"
+    },
+    "PARAM_ILLEGAL": {
+      "message": "Illegal parameters",
+      "solution": "Check request parameters format and values"
+    },
+    "PROCESS_FAIL": {
+      "message": "Token application failed",
+      "solution": "Contact technical support"
+    }
+  },
+  "examples": [
+    {
+      "description": "Apply for access token",
+      "request": {
+        "authCode": "auth_code_123456",
+        "grantType": "AUTHORIZATION_CODE",
+        "customerBelongsTo": "MPP_SYSTEM"
+      },
+      "response": {
+        "result": {
+          "resultCode": "SUCCESS",
+          "resultStatus": "S",
+          "resultMessage": "Token granted successfully"
+        },
+        "accessToken": "access_token_123456",
+        "refreshToken": "refresh_token_123456",
+        "accessTokenExpiryTime": "2024-01-01T16:30:00+08:00",
+        "refreshTokenExpiryTime": "2024-01-31T14:30:00+08:00",
+        "customerId": "customer_123456",
+        "scopes": ["PAYMENT"]
+      }
+    }
+  ],
+  "version": "1.5.9",
+  "tags": [
+    "auth",
+    "mpp",
+    "alipay-plus",
+    "token",
+    "authorization"
+  ],
+  "mcp_compatible": true,
+  "last_updated": "2024-12-25",
+  "documentation_url": "https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/apply_token?role=MPP&product=Payment1&version=1.5.9"
+} 

@@ -1,10 +1,24 @@
-# Alipay+ Payment Schema
+# Alipay+ MCP Schema Collection
 
-这个项目包含了基于 [Alipay+ API 文档](https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/pay?role=MPP&product=Payment1&version=1.5.9) 的支付接口 schema 定义和示例代码。
+> **⚠️ 免责声明 / Disclaimer**
+> 
+> - 🚧 **非官方项目** - 这是一个社区驱动的非官方项目，不隶属于蚂蚁集团或 Alipay+
+> - 📋 **Draft 版本** - 当前为草案版本，Schema 定义可能随官方文档更新而变化
+> - 🔍 **仅供参考** - 请以 [Alipay+ 官方文档](https://docs.alipayplus.com/) 为准
+> - 🛡️ **生产环境使用需谨慎** - 建议在生产环境使用前进行充分测试和验证
+> 
+> ---
+> 
+> - 🚧 **Unofficial Project** - This is an unofficial community-driven project, not affiliated with Ant Group or Alipay+
+> - 📋 **Draft Version** - Current draft version, schema definitions may change with official documentation updates
+> - 🔍 **For Reference Only** - Please refer to [official Alipay+ documentation](https://docs.alipayplus.com/) as the authoritative source
+> - 🛡️ **Use with Caution in Production** - Thorough testing and validation recommended before production use
 
-## 📋 Overview
+完整的 Alipay+ API MCP 兼容 schema 集合，包含 12 个核心接口、RSA256 签名验证和完整文档。
 
-这个项目包含了 **12 个 Alipay+ API** 的完整 MCP 兼容 schema 定义，涵盖了支付和授权相关的所有核心功能。
+## 📋 项目概述
+
+这个项目提供了基于 [Alipay+ 官方 API 文档](https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/pay?role=MPP&product=Payment1&version=1.5.9) 的完整 MCP 兼容 schema 定义，涵盖支付和授权相关的所有核心功能。
 
 ### 🔄 接口分类
 
@@ -45,7 +59,7 @@
 ## 📂 文件结构
 
 ```
-mcp_test/
+mcp-alipayplus/
 ├── schemas/
 │   ├── index.json            # 所有接口的索引和汇总
 │   ├── pay.json              # 支付处理接口 (Alipay+ → MPP)
@@ -60,14 +74,15 @@ mcp_test/
 │   ├── cancelToken.json      # 取消授权令牌接口 (MPP → Alipay+)
 │   ├── authNotify.json       # 授权状态通知接口 (Alipay+ → MPP)
 │   └── consultUnbinding.json # 解绑咨询接口 (Alipay+ → MPP)
-├── payment_example.js        # 基础支付示例
-├── payment_simple.js         # 简化版支付示例
-├── payment_with_signature.js # 包含签名验证的支付示例
+├── example-usage.js          # 完整使用示例
+├── payment_with_signature.js # RSA256 签名验证实现
 ├── signature_test.js         # 签名功能测试
-└── package.json             # 项目配置
+├── USAGE_GUIDE.md           # 详细使用指南
+├── package.json             # 项目配置
+└── README.md               # 项目说明
 ```
 
-## 🚀 使用方法
+## 🚀 快速开始
 
 ### 1. 安装依赖
 ```bash
@@ -76,131 +91,252 @@ npm install
 
 ### 2. 运行示例
 ```bash
-# 基础示例
-npm start
+# 查看使用示例
+npm run example
 
-# 简化版示例
-npm run simple
-
-# 带签名验证的示例
-npm run signature
-
-# 测试签名功能
+# 测试签名验证
 npm run test
-```
 
-### 3. Schema 管理
-```bash
-# 查看所有接口列表
-npm run schema:list
-
-# 验证所有 schema 文件
+# 验证所有 schema
 npm run schema:validate
 
-# 显示 schema 统计信息
+# 查看项目统计
 npm run schema:stats
 ```
 
-## 🔐 签名验证
+## 💻 在 Cursor 和 VS Code 中使用 MCP
 
-该 schema 包含完整的签名验证规范：
+### Cursor 配置
 
-### Content_To_Be_Signed 格式
-```
-POST /your-payment-endpoint
-<Client-Id>.<Request-Time>.<Request-Body>
-```
+1. **安装 MCP 扩展**：
+   - 在 Cursor 中打开扩展商店
+   - 搜索并安装 "MCP Client" 或相关的 MCP 扩展
 
-### 必需的 HTTP Headers
-- `Client-Id`: MPP 客户端标识符
-- `Request-Time`: ISO 8601 格式的请求时间
-- `Signature`: RSA256 签名，格式为 `algorithm=RSA256,keyVersion=0,signature=<generated_signature>`
+2. **配置 MCP 设置**：
+   创建或编辑 `.cursor/mcp-config.json` 文件：
+   ```json
+   {
+     "mcpServers": {
+       "alipayplus": {
+         "command": "node",
+         "args": ["./mcp-alipayplus/example-usage.js"],
+         "env": {
+           "NODE_ENV": "development"
+         }
+       }
+     },
+     "tools": [
+       {
+         "name": "alipayplus-pay",
+         "schema": "./mcp-alipayplus/schemas/pay.json"
+       },
+       {
+         "name": "alipayplus-user-pay",
+         "schema": "./mcp-alipayplus/schemas/userInitiatedPay.json"
+       }
+     ]
+   }
+   ```
 
-## 🌟 MCP 支持
+3. **在 Cursor 中使用**：
+   - 重启 Cursor
+   - 打开命令面板 (Cmd+Shift+P)
+   - 输入 "MCP: Load Tools"
+   - 选择 Alipay+ 相关工具
 
-这个 `pay.json` schema 支持 MCP 的以下特性：
+### VS Code 配置
 
-### 1. 工具定义
-可以作为 MCP 工具的 schema 定义，让 AI 模型理解如何处理 Alipay+ 支付请求
+1. **安装 MCP 扩展**：
+   ```bash
+   code --install-extension mcp-tools.mcp-client
+   ```
 
-### 2. 代码生成
-基于 schema 可以自动生成：
-- 请求处理函数
-- 数据验证逻辑
-- 签名验证代码
-- 错误处理逻辑
+2. **配置工作区设置**：
+   在 `.vscode/settings.json` 中添加：
+   ```json
+   {
+     "mcp.tools": {
+       "alipayplus": {
+         "path": "./mcp-alipayplus",
+         "schemas": [
+           "schemas/pay.json",
+           "schemas/userInitiatedPay.json",
+           "schemas/notifyPayment.json"
+         ],
+         "autoload": true
+       }
+     },
+     "mcp.signatureVerification": {
+       "enabled": true,
+       "algorithm": "RSA256",
+       "verifier": "./mcp-alipayplus/payment_with_signature.js"
+     }
+   }
+   ```
 
-### 3. 集成示例
+3. **创建 MCP 任务**：
+   在 `.vscode/tasks.json` 中添加：
+   ```json
+   {
+     "version": "2.0.0",
+     "tasks": [
+       {
+         "label": "MCP: Validate Alipay+ Schemas",
+         "type": "shell",
+         "command": "npm",
+         "args": ["run", "schema:validate"],
+         "group": "build",
+         "presentation": {
+           "echo": true,
+           "reveal": "always",
+           "focus": false,
+           "panel": "shared"
+         }
+       },
+       {
+         "label": "MCP: Test Signature Verification",
+         "type": "shell",
+         "command": "npm",
+         "args": ["run", "test"],
+         "group": "test"
+       }
+     ]
+   }
+   ```
+
+### 通用 MCP 配置
+
+创建 `mcp.config.js` 文件用于动态配置：
 ```javascript
-// MCP 工具集成示例
-const paymentSchema = require('./schemas/pay.json');
+const fs = require('fs');
+const path = require('path');
 
-// 使用 schema 验证请求
-function validatePaymentRequest(request) {
-  // 根据 schema 验证请求参数
-  // 返回验证结果
-}
+// 动态加载所有 schema
+const schemasDir = path.join(__dirname, 'schemas');
+const schemas = fs.readdirSync(schemasDir)
+  .filter(file => file.endsWith('.json') && file !== 'index.json')
+  .map(file => ({
+    name: file.replace('.json', ''),
+    path: path.join(schemasDir, file),
+    schema: require(path.join(schemasDir, file))
+  }));
 
-// 生成签名
-function generateSignature(request) {
-  // 根据 schema 中的签名规范生成签名
-  // 返回签名字符串
-}
+module.exports = {
+  name: 'alipayplus-mcp',
+  version: '1.0.0',
+  description: 'Alipay+ API MCP Tools',
+  tools: schemas.map(schema => ({
+    name: `alipayplus-${schema.name}`,
+    description: schema.schema.description,
+    inputSchema: {
+      type: 'object',
+      properties: schema.schema.parameters.reduce((props, param) => {
+        props[param.name] = {
+          type: param.type,
+          description: param.description,
+          required: param.required
+        };
+        return props;
+      }, {})
+    },
+    handler: async (args) => {
+      const { verifySignature } = require('./payment_with_signature');
+      
+      // 验证签名（如果需要）
+      if (schema.schema.signature_required) {
+        const isValid = verifySignature(args.data, args.headers);
+        if (!isValid) {
+          throw new Error('Signature verification failed');
+        }
+      }
+      
+      // 处理请求
+      return {
+        success: true,
+        data: args,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }))
+};
 ```
 
-## 📚 API 参考
+## 📖 使用文档
 
-### 🔗 完整接口列表
+- **详细使用指南**：查看 [USAGE_GUIDE.md](./USAGE_GUIDE.md)
+- **API 参考**：查看 `schemas/` 目录下的各个 JSON 文件
+- **签名验证**：参考 `payment_with_signature.js` 和 `signature_test.js`
 
-| 接口名 | 方向 | 类型 | 描述 |
-|--------|------|------|------|
-| `pay` | Alipay+ → MPP | Webhook | 处理支付请求 |
-| `userInitiatedPay` | MPP → Alipay+ | Client | 用户扫码支付 |
-| `notifyPayment` | Alipay+ → MPP | Webhook | 支付结果通知 |
-| `inquiryPayment` | MPP → Alipay+ | Client | 查询支付状态 |
-| `cancelPayment` | MPP → Alipay+ | Client | 取消支付订单 |
-| `refund` | Alipay+ → MPP | Webhook | 处理退款请求 |
-| `getPaymentCode` | MPP → Alipay+ | Client | 获取支付码 |
-| `prepare` | MPP → Alipay+ | Client | 预处理支付订单 |
-| `applyToken` | MPP → Alipay+ | Client | 申请授权令牌 |
-| `cancelToken` | MPP → Alipay+ | Client | 取消授权令牌 |
-| `authNotify` | Alipay+ → MPP | Webhook | 授权状态通知 |
-| `consultUnbinding` | Alipay+ → MPP | Webhook | 解绑咨询 |
+## 🧪 测试和验证
 
-### 🔑 通用签名验证
+### 验证 Schema 文件
+```bash
+# 验证所有 schema 语法
+npm run schema:validate
 
-所有接口都需要 RSA256 签名验证，包含以下 Headers：
+# 查看详细统计信息
+npm run schema:stats
 
-| Header | 类型 | 必需 | 描述 |
-|--------|------|------|------|
-| `Client-Id` | string | ✅ | MPP 客户端ID |
-| `Request-Time` | string | ✅ | ISO 8601 时间戳 |
-| `Signature` | string | ✅ | RSA256 签名 |
-
-### 📋 标准响应格式
-
-```json
-{
-  "result": {
-    "resultCode": "SUCCESS",
-    "resultStatus": "S",
-    "resultMessage": "Operation completed successfully"
-  },
-  "additionalData": "..."
-}
+# 列出所有 API
+npm run schema:list
 ```
 
-## 🔗 相关链接
+### 测试签名验证
+```bash
+# 运行签名验证测试
+npm run test
 
-- [Alipay+ API 文档](https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/pay?role=MPP&product=Payment1&version=1.5.9)
-- [Alipay+ 签名验证文档](https://docs.alipayplus.com/alipayplus/alipayplus/api_mpp/signature?role=MPP&product=Payment1&version=1.5.9)
-- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
-- [项目完成总结](./PROJECT_SUMMARY.md)
+# 查看签名验证实现
+npm run signature
+```
 
-## 📝 许可证
+## 🔗 相关资源
 
-本项目遵循 ISC 许可证。
+- **GitHub 仓库**：https://github.com/shenshutao/mcp-alipayplus
+- **Alipay+ 官方文档**：https://docs.alipayplus.com/
+- **MCP 协议规范**：https://modelcontextprotocol.io/
+- **问题反馈**：https://github.com/shenshutao/mcp-alipayplus/issues
+
+## 📊 统计信息
+
+- ✅ **总计 API**：12 个
+- ✅ **支付 API**：8 个
+- ✅ **授权 API**：4 个
+- ✅ **Webhook 接口**：5 个
+- ✅ **客户端 API**：7 个
+- ✅ **MCP 兼容性**：100%
+- 🚧 **版本状态**：Draft v0.1.0
+
+## 📄 许可证
+
+本项目采用 ISC 许可证，详情请查看 [LICENSE](LICENSE) 文件。
+
+## 🤝 贡献指南
+
+欢迎提交 Issue 和 Pull Request 来完善这个项目。在提交代码前，请确保：
+
+1. 运行 `npm run schema:validate` 验证所有 schema
+2. 运行 `npm run test` 确保签名验证功能正常
+3. 更新相关文档
+
+## ⚠️ 重要说明
+
+### 项目性质
+- **非官方项目**：本项目为社区开发者根据公开文档整理的非官方实现
+- **Draft 版本**：当前版本为草案状态，随时可能根据官方文档更新而调整
+- **学习参考**：主要用于学习和开发参考，不建议直接用于生产环境
+
+### 使用建议
+- 📖 **优先参考官方文档**：任何冲突以 [Alipay+ 官方文档](https://docs.alipayplus.com/) 为准
+- 🧪 **充分测试**：在生产环境使用前请进行全面测试
+- 🔄 **定期更新**：建议定期检查官方文档更新并同步本项目
+- 💬 **社区反馈**：发现问题请及时通过 Issues 反馈
+
+### 法律声明
+- 本项目不代表蚂蚁集团、Alipay+ 或任何官方立场
+- 使用本项目产生的任何问题由使用者自行承担
+- 本项目遵循开源协议，欢迎贡献和改进
 
 ---
 
-**🎉 这个项目包含了完整的 Alipay+ API schema 集合，100% 兼容 MCP，可以直接用于 AI 工具集成和代码生成！** 
+**如果这个项目对您有帮助，请给个 ⭐️ Star！** 

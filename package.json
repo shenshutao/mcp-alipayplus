@@ -1,11 +1,10 @@
 {
-  "name": "payment-api-example",
-  "version": "1.0.0",
-  "description": "Axios POST example for payment API based on schemas/pay.json",
-  "main": "payment_example.js",
+  "name": "mcp-alipayplus",
+  "version": "0.1.0-draft",
+  "description": "[UNOFFICIAL/DRAFT] Complete Alipay+ API MCP schema collection with 12 APIs, signature verification, and comprehensive documentation",
+  "main": "example-usage.js",
   "scripts": {
-    "start": "node payment_example.js",
-    "simple": "node payment_simple.js",
+    "example": "node example-usage.js",
     "signature": "node payment_with_signature.js",
     "test": "node signature_test.js",
     "schema:list": "node -e \"console.log(JSON.stringify(require('./schemas/index.json'), null, 2))\"",
@@ -15,8 +14,26 @@
   "dependencies": {
     "axios": "^1.6.0"
   },
-  "devDependencies": {},
-  "keywords": ["axios", "payment", "alipay", "api"],
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shenshutao/mcp-alipayplus.git"
+  },
+  "keywords": [
+    "alipay",
+    "alipayplus",
+    "payment",
+    "api",
+    "schema",
+    "mcp",
+    "model-context-protocol",
+    "webhook",
+    "signature",
+    "rsa256"
+  ],
+  "author": "shenshutao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shenshutao/mcp-alipayplus/issues"
+  },
+  "homepage": "https://github.com/shenshutao/mcp-alipayplus#readme"
 } 

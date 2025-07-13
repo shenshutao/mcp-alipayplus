@@ -127,15 +127,32 @@
     "paymentFactor": {
       "type": "object",
       "required": false,
-      "description": "Payment factors",
+      "description": "Factors that impact payment-related items",
       "properties": {
         "isInStorePayment": {
-          "type": "string",
-          "description": "TRUE for in-store payment scenarios"
+          "type": "boolean",
+          "description": "Specifies whether the payment scenario is in-store payment. If true, the payment scenario is in-store payment; otherwise, the payment scenario is online payment."
+        },
+        "needSurcharge": {
+          "type": "boolean",
+          "description": "Specifies whether the MPP is to collect a surcharge from the user. If true, the MPP is to collect a surcharge. By default, the value is false."
+        },
+        "isPaymentEvaluation": {
+          "type": "boolean",
+          "description": "Specifies whether the payment scenario is payment evaluation for Auto Debit or Cashier Payment. If true, the request only evaluates whether the user account has sufficient balance to make the payment or the user is KYC compliant, and no funds will be deducted. By default, the value is false."
         },
         "isCashierPayment": {
+          "type": "boolean",
+          "description": "Specifies whether a cashier page is presented to the user during the payment. If true, a cashier page is presented to the user during the payment; otherwise, no cashier page is presented to the user during the payment."
+        },
+        "isAgreementPayment": {
+          "type": "boolean",
+          "description": "Specifies whether the payment scenario is Auto Debit. If true, the payment scenario is Auto Debit; otherwise, the payment scenario is not Auto Debit."
+        },
+        "inStorePaymentScenario": {
           "type": "string",
-          "description": "TRUE for cashier payment scenarios"
+          "description": "The in-store payment scenario. Valid values are: PaymentCode (user presents a payment code to pay), OrderCode (user scans an order code to pay), EntryCode (user scans an entry code to pay). Note that Alipay+ may not specify this parameter in some scenarios.",
+          "enum": ["PaymentCode", "OrderCode", "EntryCode"]
         }
       }
     },
@@ -283,8 +300,12 @@
         "paymentNotifyUrl": "https://mpp.example.com/notify",
         "paymentExpiryTime": "2024-01-01T15:30:00+08:00",
         "paymentFactor": {
-          "isInStorePayment": "true",
-          "isCashierPayment": "true"
+          "isInStorePayment": true,
+          "needSurcharge": false,
+          "isPaymentEvaluation": false,
+          "isCashierPayment": true,
+          "isAgreementPayment": false,
+          "inStorePaymentScenario": "OrderCode"
         }
       },
       "response": {

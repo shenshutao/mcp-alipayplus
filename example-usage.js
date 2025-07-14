@@ -8,8 +8,7 @@ const paySchema = require('./schemas/pay.json');
 const userPaySchema = require('./schemas/userInitiatedPay.json');
 const apiIndex = require('./schemas/index.json');
 
-// 2. 引用签名验证功能 (可选)
-// const { verifySignature, generateSignature } = require('./payment_with_signature');
+// 2. 引用 schema 文件即可开始使用
 
 console.log('=== mcp-alipayplus 使用示例 ===\n');
 
@@ -85,15 +84,14 @@ const samplePaymentData = {
 // 6. 验证示例数据
 validatePaymentRequest(samplePaymentData, paySchema);
 
-// 7. 签名验证示例
-console.log('\n🔐 签名验证示例...');
+// 7. 模拟 API 处理示例
+console.log('\n📄 API 请求头示例:');
 const mockHeaders = {
     'client-id': 'test_client_id',
     'request-time': new Date().toISOString(),
-    'signature': 'mock_signature'
+    'content-type': 'application/json'
 };
 
-console.log('📄 请求头信息:');
 Object.entries(mockHeaders).forEach(([key, value]) => {
     console.log(`  ${key}: ${value}`);
 });
@@ -155,7 +153,7 @@ processApiRequest('pay', samplePaymentData);
 console.log('\n💡 使用建议:');
 console.log('  1. 将此项目作为 git submodule 引入你的项目');
 console.log('  2. 根据需要引用特定的 API schema 文件');
-console.log('  3. 使用提供的签名验证功能确保安全性');
+console.log('  3. 根据官方文档实现签名验证功能确保安全性');
 console.log('  4. 参考 USAGE_GUIDE.md 了解更多集成方式');
 console.log('  5. 使用 npm scripts 进行 schema 验证和统计');
 

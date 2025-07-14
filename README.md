@@ -14,7 +14,7 @@
 > - 🔍 **For Reference Only** - Please refer to [official Alipay+ documentation](https://docs.alipayplus.com/) as the authoritative source
 > - 🛡️ **Use with Caution in Production** - Thorough testing and validation recommended before production use
 
-完整的 Alipay+ API MCP 兼容 schema 集合，包含 12 个核心接口、RSA256 签名验证和完整文档。
+完整的 Alipay+ API MCP 兼容 schema 集合，包含 12 个核心接口和完整文档。
 
 ## 📋 项目概述
 
@@ -43,12 +43,6 @@
 - **响应格式定义**：标准化的成功和错误响应
 - **错误处理规范**：详细的错误代码和解决方案
 
-### ✅ 签名验证支持
-- **RSA256 签名算法**：符合 Alipay+ 官方标准
-- **完整签名流程**：包含签名生成和验证示例
-- **Content_To_Be_Signed**：标准化的签名内容构造
-- **测试验证工具**：内置签名测试和验证功能
-
 ### ✅ MCP 兼容性
 这个 schema 集合完全兼容 **Model Context Protocol (MCP)**，支持：
 - **AI 工具集成**：作为 MCP 工具的接口定义
@@ -75,8 +69,6 @@ mcp-alipayplus/
 │   ├── authNotify.json       # 授权状态通知接口 (Alipay+ → MPP)
 │   └── consultUnbinding.json # 解绑咨询接口 (Alipay+ → MPP)
 ├── example-usage.js          # 完整使用示例
-├── payment_with_signature.js # RSA256 签名验证实现
-├── signature_test.js         # 签名功能测试
 ├── USAGE_GUIDE.md           # 详细使用指南
 ├── package.json             # 项目配置
 └── README.md               # 项目说明
@@ -93,9 +85,6 @@ npm install
 ```bash
 # 查看使用示例
 npm run example
-
-# 测试签名验证
-npm run test
 
 # 验证所有 schema
 npm run schema:validate
@@ -165,11 +154,6 @@ npm run schema:stats
          ],
          "autoload": true
        }
-     },
-     "mcp.signatureVerification": {
-       "enabled": true,
-       "algorithm": "RSA256",
-       "verifier": "./mcp-alipayplus/payment_with_signature.js"
      }
    }
    ```
@@ -192,13 +176,6 @@ npm run schema:stats
            "focus": false,
            "panel": "shared"
          }
-       },
-       {
-         "label": "MCP: Test Signature Verification",
-         "type": "shell",
-         "command": "npm",
-         "args": ["run", "test"],
-         "group": "test"
        }
      ]
    }
@@ -239,24 +216,14 @@ module.exports = {
         return props;
       }, {})
     },
-    handler: async (args) => {
-      const { verifySignature } = require('./payment_with_signature');
-      
-      // 验证签名（如果需要）
-      if (schema.schema.signature_required) {
-        const isValid = verifySignature(args.data, args.headers);
-        if (!isValid) {
-          throw new Error('Signature verification failed');
-        }
-      }
-      
-      // 处理请求
-      return {
-        success: true,
-        data: args,
-        timestamp: new Date().toISOString()
-      };
-    }
+       handler: async (args) => {
+     // 处理请求
+     return {
+       success: true,
+       data: args,
+       timestamp: new Date().toISOString()
+     };
+   }
   }))
 };
 ```
@@ -265,7 +232,6 @@ module.exports = {
 
 - **详细使用指南**：查看 [USAGE_GUIDE.md](./USAGE_GUIDE.md)
 - **API 参考**：查看 `schemas/` 目录下的各个 JSON 文件
-- **签名验证**：参考 `payment_with_signature.js` 和 `signature_test.js`
 
 ## 🧪 测试和验证
 
@@ -279,15 +245,6 @@ npm run schema:stats
 
 # 列出所有 API
 npm run schema:list
-```
-
-### 测试签名验证
-```bash
-# 运行签名验证测试
-npm run test
-
-# 查看签名验证实现
-npm run signature
 ```
 
 ## 🔗 相关资源
@@ -316,8 +273,7 @@ npm run signature
 欢迎提交 Issue 和 Pull Request 来完善这个项目。在提交代码前，请确保：
 
 1. 运行 `npm run schema:validate` 验证所有 schema
-2. 运行 `npm run test` 确保签名验证功能正常
-3. 更新相关文档
+2. 更新相关文档
 
 ## ⚠️ 重要说明
 
